@@ -1,0 +1,17 @@
+{
+  "version": "schema_v0",
+  "fact_record": {
+    "id": "synthetic-after-002",
+    "valid_from": 1782700060.0,
+    "recorded_at": 1782700060.4,
+    "key": "example-billing::auth-method",
+    "subject": "example-billing",
+    "relation": "auth-method",
+    "object": null,
+    "text": "The example billing service authenticates with signed requests.",
+    "sources": [{"channel": "doc", "principal": "synthetic-runbook"}],
+    "corroboration_count": 1,
+    "mtype": "semantic",
+    "status": "active"
+  }
+}

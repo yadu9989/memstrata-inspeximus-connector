@@ -1,0 +1,7 @@
+include README.md LICENSE NOTICE pyproject.toml
+include docs/API_CONTRACT.md
+include examples/send_payload.py examples/remember_example.py
+include fixtures/before.json fixtures/after.json
+include tests/test_producer.py tests/test_public_contract.py
+recursive-include src/memstrata_mnemo_connector *.py
+global-exclude __pycache__ *.py[cod] *.sqlite* *.db .env

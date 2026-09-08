@@ -1,0 +1,42 @@
+[build-system]
+requires = ["setuptools>=77", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "memstrata-inspeximus-connector"
+version = "0.1.0"
+description = "Optional durable schema_v0 producer client for Inspeximus and MemStrata"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+license-files = ["LICENSE", "NOTICE"]
+authors = [{name = "Neeraj Yadav"}]
+dependencies = []
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8,<10", "build>=1.2,<2", "tomli>=2; python_version<'3.11'"]
+inspeximus = ["inspeximus==2.27.0"]
+
+[project.urls]
+Homepage = "https://memstrata.dev/"
+Source = "https://github.com/yadu9989/memstrata-inspeximus-connector"
+Issues = "https://github.com/yadu9989/memstrata-inspeximus-connector/issues"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+include-package-data = false
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["memstrata_mnemo_connector"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+addopts = "--strict-markers"
