@@ -17,7 +17,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def test_public_exports_are_available():
-    assert connector.__version__ == "0.1.0"
+    assert connector.__version__ == "0.1.1"
     for name in connector.__all__:
         assert callable(getattr(connector, name))
 

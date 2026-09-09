@@ -8,10 +8,10 @@ The client uses the Python standard library. Inspeximus is an optional dependenc
 
 ## Install
 
-Install the small Python wheel from the `v0.1.0` GitHub release. This does not require Git:
+Install the small Python wheel from the `v0.1.1` GitHub release. This does not require Git:
 
 ```console
-python -m pip install "https://github.com/yadu9989/memstrata-inspeximus-connector/releases/download/v0.1.0/memstrata_inspeximus_connector-0.1.0-py3-none-any.whl"
+python -m pip install "https://github.com/yadu9989/memstrata-inspeximus-connector/releases/download/v0.1.1/memstrata_inspeximus_connector-0.1.1-py3-none-any.whl"
 ```
 
 Or install from a reviewed checkout:
@@ -31,10 +31,12 @@ On Windows, `py -3` can replace `python` in these commands. No virtual environme
 To install the tagged source with Git:
 
 ```console
-python -m pip install "git+https://github.com/yadu9989/memstrata-inspeximus-connector.git@v0.1.0"
+python -m pip install "git+https://github.com/yadu9989/memstrata-inspeximus-connector.git@v0.1.1"
 ```
 
 The GitHub command requires Git. A PyPI release is not implied by this repository.
+
+Version 0.1.1 preserves document references from linked sources through the optional [source provenance annotation](docs/SOURCE_PROVENANCE.md). Existing outbox records keep their exact saved bytes. Do not regenerate an existing source ID to add the new annotation. See the [release notes](docs/RELEASE_NOTES_0.1.1.md).
 
 ## Send a record
 

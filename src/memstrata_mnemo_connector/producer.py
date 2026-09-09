@@ -486,17 +486,32 @@ class DurableOutbox:
         return self._finish(claim, "rejected", "permanent_http", status)
 
 
+def _source_identity_kind(source: Any) -> str:
+    """Describe the legacy identity choice, without claiming verified identity."""
+    if not source:
+        return "absent"
+    if isinstance(source, dict):
+        for field, kind in (("principal", "principal"), ("doc", "document"), ("id", "id")):
+            if source.get(field):
+                return kind
+    return "opaque"
+
+
 def _normal_source(source: Any) -> dict[str, str] | None:
     if not source:
         return None
     if isinstance(source, dict):
-        principal = (
-            source.get("principal")
-            or source.get("doc")
-            or source.get("id")
-            or json.dumps(source, sort_keys=True)
+        principal = source.get("principal") or source.get("doc") or source.get("id")
+        if not principal:
+            try:
+                principal = json.dumps(source, sort_keys=True)
+            except (TypeError, ValueError, UnicodeError, RecursionError):
+                raise ProducerError("Source annotations must be valid JSON.") from None
+        # A document handle may accompany a principal. It is not the kind of
+        # that principal, so infer "doc" only when the document is the identity.
+        channel = source.get("channel") or (
+            "doc" if _source_identity_kind(source) == "document" else "unknown"
         )
-        channel = source.get("channel") or ("doc" if source.get("doc") else "unknown")
     else:
         principal, channel = str(source), "unknown"
     return {"channel": str(channel), "principal": str(principal)}
@@ -518,14 +533,33 @@ def freeze_record(store: Any, record: dict[str, Any]) -> dict[str, Any]:
     if key is not None and not isinstance(key, str):
         raise ProducerError("The source key must be a string or null.")
     subject, relation = (key.split("::", 1) + [None])[:2] if key else (None, None)
-    sources, seen = [], set()
-    for raw_source in [record.get("source")] + [
-        by_id[i].get("source") for i in record.get("links", []) if i in by_id
-    ]:
+    sources, source_indexes, associations = [], {}, []
+    scoped_records = [("primary", record)]
+    seen_records = {record["id"]}
+    for linked_id in record.get("links", []):
+        if linked_id in by_id and linked_id not in seen_records:
+            seen_records.add(linked_id)
+            scoped_records.append(("linked", by_id[linked_id]))
+    for role, scoped_record in scoped_records:
+        raw_source = scoped_record.get("source")
         source = _normal_source(raw_source)
-        if source and source["principal"] not in seen:
-            seen.add(source["principal"])
-            sources.append(source)
+        source_index = None
+        if source:
+            principal = source["principal"]
+            if principal not in source_indexes:
+                source_indexes[principal] = len(sources)
+                sources.append(source)
+            source_index = source_indexes[principal]
+        if "source" in scoped_record:
+            # Keep each association, even if several documents share a
+            # principal. This is provenance, not additional corroboration.
+            associations.append({
+                "role": role,
+                "writer_record_id": scoped_record["id"],
+                "identity_kind": _source_identity_kind(raw_source),
+                "source_index": source_index,
+                "source": raw_source,
+            })
     fact = {
         "id": record["id"],
         "valid_from": record.get("valid_from", record["ts"]),
@@ -563,10 +597,19 @@ def freeze_record(store: Any, record: dict[str, Any]) -> dict[str, Any]:
         "provisional",
     )
     fact["writer_metadata"] = {k: record[k] for k in metadata_keys if k in record}
+    fact["writer_metadata"]["source_provenance"] = {
+        "version": "source_provenance_v1",
+        "identity_rule": "principal_then_doc_then_id_else_opaque",
+        "independence": "unverified",
+        "associations": associations,
+    }
     payload = {"version": "schema_v0", "fact_record": fact}
     _source_id(payload)
     # Detach mutable tracked dictionaries from the source handle.
-    return json.loads(canonical_bytes(payload).decode("utf-8"))
+    raw = canonical_bytes(payload)
+    if len(raw) > MAX_BODY_BYTES:
+        raise ProducerError("Fact envelope exceeds the 64 KiB request limit.")
+    return json.loads(raw.decode("utf-8"))
 
 
 def remember_and_enqueue(store: Any, outbox: DurableOutbox, text: str, **kwargs) -> str:
