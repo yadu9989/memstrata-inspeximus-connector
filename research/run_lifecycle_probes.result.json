@@ -1,0 +1,29 @@
+{
+  "code_sha256": {
+    "lifecycle_reference.py": "d1677b9e183eb0dd8112d14fd306468ef526db02a5b4680d42d81d004f22f833",
+    "provenance_projection.py": "cd3f297ec2fb7dc6cea2246eaef439994d282efa65f9be3bc57b266ce85cd77f",
+    "run_lifecycle_probes.py": "f29d9e3aee2143b5958fd5f8ea3e16256e3148420a7a96e5beaa222fc2f1038a"
+  },
+  "false_erasure_claim": {
+    "actually_deleted": false,
+    "complete": false,
+    "global_erasure_proven": false,
+    "reported_count": 2,
+    "weaker_retry_rejected": true
+  },
+  "python": "3.13.14",
+  "scope": "owned synthetic SQLite fixtures only; not live APIs or hardware erasure",
+  "source_slots": {
+    "compaction_resolved": "C",
+    "expected_survivor": "B",
+    "tombstone_resolved": "B"
+  },
+  "sqlite": "3.50.4",
+  "zero_count_real_erasure": {
+    "actually_deleted": true,
+    "complete": true,
+    "global_erasure_proven": false,
+    "reported_count": 0,
+    "weaker_retry_rejected": null
+  }
+}

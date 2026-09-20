@@ -64,6 +64,16 @@ Example with two documents from the same team:
 
 This example is a fragment of a fact record, not a complete request.
 
+## Lifecycle interpretation of positions
+
+Positions refer to the immutable source array in that frozen payload. A consumer
+must not compact the array after partial erasure while preserving old association
+indices. The proposed lifecycle companion uses stable tombstoned positions in a
+separate projection. It does not rewrite queued schema_v0 envelopes or add an
+unnegotiated tombstone type to their wire format. See
+[the lifecycle proposal](LIFECYCLE_COMPANION_DRAFT.md) for source-copy coverage and
+the bounded replay-refusal proposal. Current connector 0.1.1 does not implement erasure.
+
 ## Compact source labels and counts
 
 `sources[].principal` keeps the existing selection order: explicit principal, document, ID, then an opaque representation. An explicit `channel` is preserved as the writer supplied it. Without an explicit channel, the connector sets `channel="doc"` only when the document itself supplied the compact identity. If an explicit principal supplied that identity, an accompanying document does not make it a document identity; the channel is `unknown`.

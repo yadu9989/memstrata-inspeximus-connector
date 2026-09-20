@@ -1,5 +1,9 @@
 # MemStrata Inspeximus connector
 
+The [offline lifecycle reference](research/README.md) and
+[joint technical pilot checklist](docs/JOINT_PILOT.md) are available for peer testing.
+They do not change connector 0.1.1, enable a deletion endpoint or modify schema_v0.
+
 A small Python client that sends Inspeximus fact records to a separately operated MemStrata receiver. It saves each outgoing record in a local SQLite outbox before delivery, retries the same payload after temporary failures, and checks the acknowledgement against the source ID and payload hash.
 
 Inspeximus, formerly mnemo, remains usable on its own. This connector is optional. It contains no MemStrata engine, receiver, retrieval code, model weights or service credentials. Access to a compatible receiver is arranged separately.
