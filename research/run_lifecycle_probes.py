@@ -73,7 +73,8 @@ def main():
             'python':platform.python_version(),'sqlite':sqlite3.sqlite_version,
             'false_erasure_claim':false_claim,'zero_count_real_erasure':zero_report,
             'source_slots':{'expected_survivor':'B','compaction_resolved':'C','tombstone_resolved':good},
-            'code_sha256':{p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in
+            'code_hash_normalization':'Source bytes with CRLF normalized to LF for cross-platform checkout identity',
+            'code_sha256':{p.name:hashlib.sha256(p.read_bytes().replace(b'\r\n',b'\n')).hexdigest() for p in
                 [Path(__file__),root/'lifecycle_reference.py',root/'fixture_verifier.py',root/'provenance_projection.py']}}
     path=root/'run_lifecycle_probes.result.json'
     path.write_text(json.dumps(result,indent=2,sort_keys=True)+'\n',encoding='utf-8')

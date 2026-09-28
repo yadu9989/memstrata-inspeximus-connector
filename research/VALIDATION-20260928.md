@@ -14,7 +14,8 @@ steps; tampered-fixture refusal; and fixture-directory overwrite refusal.
 The existing held-open WAL, marker-binding and provenance tests continue to pass.
 
 The standalone receipt at run_lifecycle_probes.result.json includes local code
-hashes. The dishonest byte probe now produces incomplete, with markers found by
+hashes normalized from CRLF to LF so the same published source compares across
+Windows/Linux/macOS checkouts. The dishonest byte probe now produces incomplete, with markers found by
 the coordinator and adapter disagreement reported. Counts alone do not decide
 the verdict. Honest deletion still completes for the registered synthetic files.
 

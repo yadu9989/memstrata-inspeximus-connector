@@ -1,10 +1,11 @@
 {
   "capability": "inspeximus-lifecycle-experimental-v2",
+  "code_hash_normalization": "Source bytes with CRLF normalized to LF for cross-platform checkout identity",
   "code_sha256": {
     "fixture_verifier.py": "d9e194465b89c765ab27a9a3e3e564c06c9d560bc3358e85c902e6d5c372d1c4",
     "lifecycle_reference.py": "a92eac68425661152bd124b658496e8b72f94eac56314d0e3b44b2bb4b99dc89",
     "provenance_projection.py": "cd3f297ec2fb7dc6cea2246eaef439994d282efa65f9be3bc57b266ce85cd77f",
-    "run_lifecycle_probes.py": "5ec84fe7391aaaa5da7eeac5b38da1ba5cd30ff6c2452ad8c4a92719c683d2a2"
+    "run_lifecycle_probes.py": "58d2fb5cbeabb9719f20009e69852c3038683606390d7714af42557dbd623d66"
   },
   "false_erasure_claim": {
     "actually_deleted": false,
