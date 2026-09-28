@@ -1,6 +1,8 @@
 # Lifecycle companion proposal for the Inspeximus pilot
 
-MemStrata-side proposal, September 20, 2026. Awaiting Rastislav's agreement.
+MemStrata-side proposal, September 20, 2026. The design boundaries were agreed by
+Rastislav in his September 21 email. Implementation and capability qualification
+remain pending; this does not enable production lifecycle operations.
 This is a technical research plan, not a service contract, legal retention policy
 or production erasure API. `schema_v0` and connector 0.1.1 are unchanged.
 
@@ -42,7 +44,7 @@ an extra metadata echo is a failing control, not silently ignored.
 
 Propose a **30-day maximum** subject-linked HMAC retention window for the synthetic
 lifecycle pilot, starting when its suppression operation is committed. Access and
-retries do not extend it. This window is a proposal to agree and implement, not an
+retries do not extend it. This agreed design window is still to implement, not an
 already-running production policy or a claim about legal erasure deadlines.
 An earlier delivery-scope expiry wins; this proposal does not extend the current
 pilot's October 8 authorization window. An unmet prerequisite is reported as an

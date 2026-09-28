@@ -1,0 +1,22 @@
+{
+  "synthetic_only": true,
+  "namespace": "synthetic-joint-7ac34ce17bc1489aabc2805df3a95ae2",
+  "created_at": 1790635498.289035,
+  "files": [
+    {
+      "file": "before.json",
+      "source_id": "synthetic-joint-7ac34ce17bc1489aabc2805df3a95ae2-before",
+      "sha256": "ade1e66ffffa30ff871eb36e4db91adc7444dfe8b233b621ecba34b71c0b3521",
+      "bytes": 1354,
+      "corroboration_count": 1
+    },
+    {
+      "file": "after.json",
+      "source_id": "synthetic-joint-7ac34ce17bc1489aabc2805df3a95ae2-after",
+      "sha256": "090259b20a5613020da156ab2177301f793789aeb6478d76fc1d0e6a17f30d07",
+      "bytes": 1365,
+      "corroboration_count": 1
+    }
+  ],
+  "retry": "Send before.json, after.json, then the SAME before.json bytes. Do not regenerate."
+}

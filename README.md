@@ -1,5 +1,9 @@
 # MemStrata Inspeximus connector
 
+The [September 28 test packet](docs/RASTISLAV_TEST_PACKET_20260928.md) provides
+fixed synthetic data, schema, a restart-safe runner and the independent lifecycle
+verification correction. No private engine or credentials are included.
+
 The [offline lifecycle reference](research/README.md) and
 [joint technical pilot checklist](docs/JOINT_PILOT.md) are available for peer testing.
 They do not change connector 0.1.1, enable a deletion endpoint or modify schema_v0.

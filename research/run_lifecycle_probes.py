@@ -5,7 +5,7 @@ import platform
 import sqlite3
 from pathlib import Path
 
-from lifecycle_reference import Coordinator, KINDS, Request, SQLiteTarget, SyntheticWorkspace, Target
+from lifecycle_reference import Coordinator, KINDS, Request, SQLiteTarget, SyntheticWorkspace, Target, CAPABILITY, VERIFIER
 from provenance_projection import project_sources
 
 KEY=b'synthetic-probe-key-not-a-service-secret-32'
@@ -44,6 +44,19 @@ def main():
     zero_report=count_probe(True,0)
     assert not false_claim['complete'] and false_claim['weaker_retry_rejected']
     assert zero_report['complete'] and not zero_report['global_erasure_proven']
+    class LyingByteTarget(SQLiteTarget):
+        def apply(self,*args): pass
+        def inspect(self,*args): return {'rows':0,'current':0}
+        def byte_probe(self,values):
+            return {'status':'checked','matched':0,'files':[],'probe_hits':[False]*len(values)}
+    with SyntheticWorkspace() as ws:
+        targets=tuple(Target(k,k) for k in sorted(KINDS))
+        stores={t.name:LyingByteTarget(ws,t) for t in targets}
+        c=Coordinator(ws,stores,hmac_key=KEY,authorize=lambda p,r:p=='operator')
+        for store in stores.values():store.seed(c.scope('tenant','subject'),c.record('record'),MARKER*100)
+        lying=c.execute(Request('lying-byte-probe','tenant','subject','erased',targets),'operator',probe_values=(MARKER,))
+        assert not lying['complete']
+        assert all(e['byte_probe']['matched']>0 and not e['adapter_agrees'] for e in lying['entries'].values())
     f={'sources':[{'principal':p} for p in ('A','B','C')],
        'writer_metadata':{'source_provenance':{'associations':[
            {'source_index':i,'source':{'principal':p}} for i,p in enumerate(('A','B','C'))]}}}
@@ -55,11 +68,13 @@ def main():
     assert bad=='C' and good=='B'
     root=Path(__file__).parent
     result={'scope':'owned synthetic SQLite fixtures only; not live APIs or hardware erasure',
+            'capability':CAPABILITY,'verifier':VERIFIER,
+            'lying_byte_probe':{'complete':lying['complete'],'independent_markers_present':True,'adapter_mismatch_detected':True},
             'python':platform.python_version(),'sqlite':sqlite3.sqlite_version,
             'false_erasure_claim':false_claim,'zero_count_real_erasure':zero_report,
             'source_slots':{'expected_survivor':'B','compaction_resolved':'C','tombstone_resolved':good},
             'code_sha256':{p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in
-                [Path(__file__),root/'lifecycle_reference.py',root/'provenance_projection.py']}}
+                [Path(__file__),root/'lifecycle_reference.py',root/'fixture_verifier.py',root/'provenance_projection.py']}}
     path=root/'run_lifecycle_probes.result.json'
     path.write_text(json.dumps(result,indent=2,sort_keys=True)+'\n',encoding='utf-8')
     print(json.dumps(result,indent=2,sort_keys=True))

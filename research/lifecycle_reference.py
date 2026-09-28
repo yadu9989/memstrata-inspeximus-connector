@@ -17,8 +17,13 @@ from contextlib import contextmanager
 from dataclasses import asdict, dataclass
 from pathlib import Path
 
-CAPABILITY = "mnemo-lifecycle-experimental-v1"
-VERIFIER = "scoped-logical-and-exact-utf8-fixture-files-v1"
+try:
+    from . import fixture_verifier
+except ImportError:  # Standalone probe entry point.
+    import fixture_verifier
+
+CAPABILITY = "inspeximus-lifecycle-experimental-v2"
+VERIFIER = "coordinator-owned-logical-and-exact-utf8-fixture-files-v2"
 KINDS = frozenset({"current", "history", "outbox", "index", "vectors", "backups"})
 LIVE_KINDS = frozenset({"current", "outbox", "index", "vectors"})
 ACTIONS = frozenset({"superseded", "retracted", "erased"})
@@ -74,7 +79,7 @@ class SyntheticWorkspace:
     """The only constructor for experimental storage; accepts no caller path."""
 
     def __init__(self):
-        self._temp = tempfile.TemporaryDirectory(prefix="mnemo-lifecycle-experimental-")
+        self._temp = tempfile.TemporaryDirectory(prefix="inspeximus-lifecycle-experimental-")
         self.root = Path(self._temp.name).resolve()
 
     def path(self, name):
@@ -287,6 +292,18 @@ class Coordinator(_Database):
     def key(self, domain, *parts):
         return hmac.new(self._key, canonical([domain, *parts]).encode(), hashlib.sha256).hexdigest()
 
+    def _verify_path(self, target):
+        # Never accept adapter.path or a path returned by the adapter as evidence.
+        return self.workspace.path("target-" + target.name)
+
+    def _inspect_independently(self, target, scope_key, record_key):
+        return fixture_verifier.inspect_rows(
+            self.workspace.root, self._verify_path(target), CAPABILITY, scope_key, record_key
+        )
+
+    def _scan_independently(self, target, values):
+        return fixture_verifier.byte_scan(self.workspace.root, self._verify_path(target), values)
+
     def scope(self, tenant, subject):
         return self.key("subject", tenant, subject)
 
@@ -462,7 +479,7 @@ class Coordinator(_Database):
                 entries[target.name] = {"kind": target.kind, "status": "unknown_target"}
                 continue
             try:
-                before = adapter.inspect(scope_key, record_key)
+                before, payloads = self._inspect_independently(target, scope_key, record_key)
                 if dry_run:
                     entries[target.name] = {
                         "kind": target.kind,
@@ -472,7 +489,18 @@ class Coordinator(_Database):
                     continue
                 if request.action == "erased":
                     if before["rows"]:
-                        calibration = adapter.calibrate(scope_key, record_key, probe_values)
+                        physical = self._scan_independently(target, probe_values)
+                        logical = bool(probe_values) and all(
+                            any(v in p for p in payloads) for v in probe_values
+                        )
+                        positive = logical and physical["status"] == "checked" and all(physical["probe_hits"])
+                        calibration = {
+                            "status": "positive_verified" if positive else "positive_control_failed",
+                            "before_rows": before["rows"],
+                            "logical_values_present": logical,
+                            "file_values_present": physical.get("probe_hits", []),
+                            "authority": "coordinator",
+                        }
                     elif calibration is None:
                         calibration = {"status": "empty_at_observation", "before_rows": 0}
                     entries[target.name] = {
@@ -491,9 +519,17 @@ class Coordinator(_Database):
                 adapter.apply(request.action, scope_key, record_key)
                 if after_target:
                     after_target(target.name)
-                remaining = adapter.inspect(scope_key, record_key)
+                remaining, _ = self._inspect_independently(target, scope_key, record_key)
+                adapter_remaining = adapter.inspect(scope_key, record_key)
                 byte_check = (
-                    adapter.byte_probe(probe_values) if request.action == "erased" else None
+                    self._scan_independently(target, probe_values) if request.action == "erased" else None
+                )
+                adapter_byte_check = adapter.byte_probe(probe_values) if request.action == "erased" else None
+                adapter_agrees = adapter_remaining == remaining and (
+                    request.action != "erased" or all(
+                        adapter_byte_check.get(k) == byte_check.get(k)
+                        for k in ("status", "matched", "probe_hits")
+                    )
                 )
                 logical_ok = (
                     remaining["rows"] == 0
@@ -502,7 +538,7 @@ class Coordinator(_Database):
                     if target.kind in LIVE_KINDS
                     else True
                 )
-                verified = logical_ok and (
+                verified = adapter_agrees and logical_ok and (
                     request.action != "erased"
                     or (byte_check["status"] == "checked" and byte_check["matched"] == 0)
                 )
@@ -512,6 +548,9 @@ class Coordinator(_Database):
                     "remaining": remaining,
                     "logical_verified": logical_ok,
                     "byte_probe": byte_check,
+                    "verification_authority": "coordinator",
+                    "adapter_claim": {"remaining": adapter_remaining, "byte_probe": adapter_byte_check},
+                    "adapter_agrees": adapter_agrees,
                     "audit_content_retained": request.action != "erased",
                     "calibration": calibration,
                 }

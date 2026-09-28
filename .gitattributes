@@ -1,0 +1,2 @@
+# Frozen canonical request bytes must survive checkout on every platform.
+fixtures/joint-rastislav-20260928/*.json -text

@@ -1,8 +1,10 @@
 {
+  "capability": "inspeximus-lifecycle-experimental-v2",
   "code_sha256": {
-    "lifecycle_reference.py": "d1677b9e183eb0dd8112d14fd306468ef526db02a5b4680d42d81d004f22f833",
+    "fixture_verifier.py": "d9e194465b89c765ab27a9a3e3e564c06c9d560bc3358e85c902e6d5c372d1c4",
+    "lifecycle_reference.py": "a92eac68425661152bd124b658496e8b72f94eac56314d0e3b44b2bb4b99dc89",
     "provenance_projection.py": "cd3f297ec2fb7dc6cea2246eaef439994d282efa65f9be3bc57b266ce85cd77f",
-    "run_lifecycle_probes.py": "f29d9e3aee2143b5958fd5f8ea3e16256e3148420a7a96e5beaa222fc2f1038a"
+    "run_lifecycle_probes.py": "5ec84fe7391aaaa5da7eeac5b38da1ba5cd30ff6c2452ad8c4a92719c683d2a2"
   },
   "false_erasure_claim": {
     "actually_deleted": false,
@@ -10,6 +12,11 @@
     "global_erasure_proven": false,
     "reported_count": 2,
     "weaker_retry_rejected": true
+  },
+  "lying_byte_probe": {
+    "adapter_mismatch_detected": true,
+    "complete": false,
+    "independent_markers_present": true
   },
   "python": "3.13.14",
   "scope": "owned synthetic SQLite fixtures only; not live APIs or hardware erasure",
@@ -19,6 +26,7 @@
     "tombstone_resolved": "B"
   },
   "sqlite": "3.50.4",
+  "verifier": "coordinator-owned-logical-and-exact-utf8-fixture-files-v2",
   "zero_count_real_erasure": {
     "actually_deleted": true,
     "complete": true,

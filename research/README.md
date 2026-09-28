@@ -1,5 +1,13 @@
 # Offline lifecycle reference
 
+September 28: [complete partner test packet](../docs/RASTISLAV_TEST_PACKET_20260928.md).
+The v0.2 reference uses `inspeximus-lifecycle-experimental-v2` and coordinator-owned
+verification. Calibration and post-operation row/file scans no longer trust adapter
+overrides. Disagreement leaves the operation incomplete. Credit to Rastislav Drahos
+for the lying-byte-probe counterexample. The v0.1 tag remains unchanged.
+New verifier semantics require fresh synthetic workspaces, not silent migration
+of an old operation store. Existing client imports and HTTP routes are unchanged.
+
 This is the standalone reference requested by Rastislav (DanceNitra) in
 [Agora discussion 2](https://github.com/DanceNitra/agora/discussions/2#discussioncomment-18366258).
 It is MIT-licensed research code, separate from the connector wheel, receiving

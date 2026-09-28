@@ -1,5 +1,10 @@
 # Joint technical pilot checklist
 
+For the frozen September 28 pair, schema, expected results and restart-safe runner,
+use [the complete partner packet](RASTISLAV_TEST_PACKET_20260928.md).
+The Governance walkthrough will be a recording followed by written questions,
+as Rastislav requested; no live meeting is required for this test.
+
 Scope: an optional Inspeximus 2.27.0 / connector 0.1.1 write-to-receipt integration
 and a Governance walkthrough using synthetic data. The discussion records agreement
 to test the provenance annotation. Completion still requires the counterpart's
